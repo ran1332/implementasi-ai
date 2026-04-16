@@ -1,0 +1,276 @@
+{
+  "name": "tugas 4 Implementasi Ai",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes"
+            }
+          ]
+        }
+      },
+      "id": "d7295208-5ca6-4956-9dd9-93336a6d4c7d",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -96,
+        16
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1-i0Zm1InJRWQFiU_L6RrazNGUOoocGhG_KnHZ5rbt_4",
+          "mode": "list",
+          "cachedResultName": "tugas implementasi AI 4",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-i0Zm1InJRWQFiU_L6RrazNGUOoocGhG_KnHZ5rbt_4/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1215320998,
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-i0Zm1InJRWQFiU_L6RrazNGUOoocGhG_KnHZ5rbt_4/edit#gid=1215320998"
+        },
+        "options": {}
+      },
+      "id": "a59ec596-a2fe-41f4-8074-88646e457fdd",
+      "name": "Get Rows",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        112,
+        16
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "wywd9W9VHCx88sa3",
+          "name": "Google Sheets account 6"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nconst now = new Date(new Date().toLocaleString(\"en-US\", { timeZone: \"Asia/Jakarta\" }));\n\nconst results = [];\n\nfor (const item of items) {\n  const data = item.json;\n\n  const tanggal = data[\"Scheduled Date\"];\n  const waktu = data[\"Scheduled Time\"];\n  const status = data[\"Status\"];\n\n  // bikin case insensitive\n  if (!tanggal || !waktu || status?.toLowerCase() !== \"pending\") continue;\n\n  const scheduled = new Date(`${tanggal} ${waktu}`);\n\n  if (isNaN(scheduled)) continue;\n\n  if (scheduled <= now) {\n    results.push({\n      json: {\n        ...data,\n        row_number: data.row_number,\n        Status: \"Published\"\n      }\n    });\n  }\n}\n\nreturn results;"
+      },
+      "id": "a8c37113-394d-4632-bff7-8d5de3e47d49",
+      "name": "Filter & Time Logic",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        304,
+        16
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "6694078886",
+        "text": "={{ $json.Content }}",
+        "additionalFields": {}
+      },
+      "id": "b63ea1f4-3121-440d-b19c-728e354c8973",
+      "name": "Send Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [
+        512,
+        16
+      ],
+      "webhookId": "6805cdb3-d33e-4d0a-ab41-a672c1eca01c",
+      "credentials": {
+        "telegramApi": {
+          "id": "7F3QHpvmxcywTZss",
+          "name": "Telegram account 6"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "3d406970-d8f5-4df9-b917-32e17c91d7f1",
+      "name": "Prepare Update",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3,
+      "position": [
+        704,
+        16
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1-i0Zm1InJRWQFiU_L6RrazNGUOoocGhG_KnHZ5rbt_4",
+          "mode": "list",
+          "cachedResultName": "tugas implementasi AI 4",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-i0Zm1InJRWQFiU_L6RrazNGUOoocGhG_KnHZ5rbt_4/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1215320998,
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-i0Zm1InJRWQFiU_L6RrazNGUOoocGhG_KnHZ5rbt_4/edit#gid=1215320998"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Content": "=hebat kamu bud",
+            "Scheduled Date": "2026-04-16",
+            "Scheduled Time": "18:45",
+            "Status": "publish",
+            "row_number": 5
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "Content",
+              "displayName": "Content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Scheduled Date",
+              "displayName": "Scheduled Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Scheduled Time",
+              "displayName": "Scheduled Time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "5d1f75c0-0851-456a-81b2-86889f74b215",
+      "name": "Update Row",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        912,
+        16
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "wywd9W9VHCx88sa3",
+          "name": "Google Sheets account 6"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get Rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Rows": {
+      "main": [
+        [
+          {
+            "node": "Filter & Time Logic",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter & Time Logic": {
+      "main": [
+        [
+          {
+            "node": "Send Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Telegram": {
+      "main": [
+        [
+          {
+            "node": "Prepare Update",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Update": {
+      "main": [
+        [
+          {
+            "node": "Update Row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "31bc1458-f145-41a6-b64b-9fde151fb785",
+  "meta": {
+    "instanceId": "a8029a7adbdc0dbd60336a80f6905c6c6343c6a279cd22aaad11890dcf0bf2ab"
+  },
+  "id": "anrHnRuXw74vklIg",
+  "tags": []
+}
