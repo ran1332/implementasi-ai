@@ -1,0 +1,490 @@
+{
+  "name": "Tugas 5 Implementasi Ai",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 15
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -176,
+        208
+      ],
+      "id": "91a2cd03-e00d-4a76-8c45-69ec500a8515",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://google.serper.dev/search",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendQuery": true,
+        "specifyQuery": "json",
+        "jsonQuery": "{\"q\":\"\\\"NF Academy\\\" OR \\\"Nurul Fikri Academy\\\"\",\"gl\":\"id\"}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "1dd9a7986416800bd7033889478331a9c0fc8058'",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "source",
+              "value": "={{ $json }}"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        0,
+        0
+      ],
+      "id": "b9177bb1-cc5f-4bfa-931a-593ad31ccffa",
+      "name": "NFA",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "KOosnYtvzs8omh3Q",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://google.serper.dev/search",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendQuery": true,
+        "specifyQuery": "json",
+        "jsonQuery": "{\"q\":\"\\\"NF Academy\\\" OR \\\"Nurul Fikri Academy\\\"\",\"gl\":\"id\"}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-KEY",
+              "value": "c1b2717ffb1800b50163e24628fb2cbf73313e25"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "source",
+              "value": "={{ $json }}"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        0,
+        208
+      ],
+      "id": "c0f8696b-47c2-4262-8f52-884c613fa4d2",
+      "name": "BISA AI",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "KOosnYtvzs8omh3Q",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://google.serper.dev/search",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendQuery": true,
+        "specifyQuery": "json",
+        "jsonQuery": "{\"q\":\"\\\"NF Academy\\\" OR \\\"Nurul Fikri Academy\\\"\",\"gl\":\"id\"}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-KEY",
+              "value": "fce369869410a21b30097201aa806d03902e1f01"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "source",
+              "value": "={{ $json }}"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        0,
+        416
+      ],
+      "id": "253e6808-84e1-4dea-b479-ab68415ba52b",
+      "name": "Vinix7",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "KOosnYtvzs8omh3Q",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "numberInputs": 3
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        208,
+        192
+      ],
+      "id": "c4272b00-8cdf-44d3-940b-fd5df123ed5d",
+      "name": "Menggabungkan Data"
+    },
+    {
+      "parameters": {
+        "jsCode": "const allItems = $input.all();\nconst total = allItems.length;\n\nconst counts = {\n  nfa: allItems.filter(i => (i.json.brand || \"\").toLowerCase() === \"nf academy\").length,\n  bisa: allItems.filter(i => (i.json.brand || \"\").toLowerCase() === \"bisa ai\").length,\n  vinix: allItems.filter(i => (i.json.brand || \"\").toLowerCase() === \"vinix 7\").length\n};\n\nconst sov = {\n  nfa: total > 0 ? ((counts.nfa / total) * 100).toFixed(1) : 0,\n  bisa: total > 0 ? ((counts.bisa / total) * 100).toFixed(1) : 0,\n  vinix: total > 0 ? ((counts.vinix / total) * 100).toFixed(1) : 0\n};\n\nlet combinedText = \"\";\nallItems.forEach(item => {\n  const brand = item.json.brand || \"Unknown\";\n  const title = item.json.title || \"-\";\n  const snippet = item.json.snippet || \"-\";\n\n  combinedText += `[${brand}] ${title}: ${snippet}\\n\\n`;\n});\n\nreturn [\n  {\n    json: {\n      metrics: {\n        processedAt: new Date().toISOString(),\n        total_mentions: total,\n        breakdown: counts,\n        share_of_voice: sov,\n        dashboard_url: \"https://docs.google.com/spreadsheets/d/19yDBpx981bYwOzIKD7oxHG80YdfDqY_ZUmVyCIYbXNU/edit\"\n      },\n      text_for_ai: combinedText\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        416,
+        208
+      ],
+      "id": "40dd5003-60cb-4fe5-8c1c-250db91e6592",
+      "name": "Menyiapkan Data"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json }}",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        608,
+        208
+      ],
+      "id": "6f7c8e68-579d-4a9b-978e-851deec7e213",
+      "name": "Prompt untuk membandingkan"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-20b:free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        528,
+        416
+      ],
+      "id": "a7182e3a-d579-4c4e-aee4-ff8238659299",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "XSsfojxM0UboPES4",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1Vg4z15ElQ3uJLxnStq2XRpAoyerCPYyA3fahQji1GHw",
+          "mode": "list",
+          "cachedResultName": "Data Brand dan Kompetitor",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Vg4z15ElQ3uJLxnStq2XRpAoyerCPYyA3fahQji1GHw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 380332531,
+          "mode": "list",
+          "cachedResultName": "Data Brand dan Kompetitor",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Vg4z15ElQ3uJLxnStq2XRpAoyerCPYyA3fahQji1GHw/edit#gid=380332531"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        944,
+        208
+      ],
+      "id": "5139da59-2501-41ad-92c9-aa1e58dff6c8",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "wywd9W9VHCx88sa3",
+          "name": "Google Sheets account 6"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "html": "<!DOCTYPE html> \n<html lang=\"id\"> \n<head> \n  <meta charset=\"UTF-8\" /> \n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"/> \n  <title>Laporan Strategi Bisnis & Intelijen Kompetitif</title> \n \n  <style> \n    :root { \n      --orange: #FF6B35; \n      --blue: #2E5AAC; \n      --blue-light: #4A7DCC; \n      --gray-bg: #f8f9fa; \n      --text-dark: #333; \n      --text-light: #6c757d; \n    } \n \n    * { \n      margin: 0; \n      padding: 0; \n      box-sizing: border-box; \n    } \n \n    body { \n      font-family: Arial, Helvetica, sans-serif; \n      line-height: 1.6; \n      color: var(--text-dark); \n      background: #ffffff; \n    } \n \n    .container { \n      max-width: 1000px; \n      margin: 0 auto; \n      padding: 24px; \n    } \n \n    header { \n      background: linear-gradient(135deg, var(--blue), var(--blue-light)); \n      color: white; \n      padding: 48px 24px; \n      text-align: center; \n      border-radius: 0 0 14px 14px; \n    } \n \n    header h1 { \n      font-size: 28px; \n      font-weight: bold; \n      margin-bottom: 10px; \n    } \n \n    header p { \n      font-size: 15px; \n      opacity: 0.95; \n    } \n \n    .badge { \n      display: inline-block; \n      margin-top: 12px; \n      background: var(--orange); \n      padding: 6px 14px; \n      border-radius: 20px; \n      font-size: 13px; \n      font-weight: bold; \n    } \n \n    section { \n      background: #ffffff; \n      margin: 32px 0; \n      padding: 28px; \n      border-radius: 12px; \n      border: 1px solid #eee; \n    } \n \n    h2 { \n      font-size: 22px; \n      color: var(--blue); \n      margin-bottom: 18px; \n      padding-bottom: 8px; \n      border-bottom: 2px solid var(--orange); \n    } \n \n    h3 { \n      font-size: 18px; \n      color: var(--blue); \n      margin: 18px 0 10px; \n    } \n \n    p { \n      margin-bottom: 12px; \n    } \n \n    ul, ol { \n      margin-left: 22px; \n    } \n \n    li { \n      margin-bottom: 10px; \n    } \n \n    .highlight { \n      background: #fff4e6; \n      padding: 2px 6px; \n      border-radius: 4px; \n      font-weight: bold; \n      color: #d35400; \n    } \n \n    /* Table */ \n    table { \n      width: 100%; \n      border-collapse: collapse; \n      margin-top: 16px; \n    } \n \n    th { \n      background: var(--blue); \n      color: white; \n      padding: 12px; \n      font-size: 14px; \n    } \n \n    td { \n      padding: 12px; \n      border-bottom: 1px solid #eee; \n      font-size: 14px; \n      vertical-align: top; \n    } \n \n    .brand-bisa { background: #fff7f1; } \n    .brand-nf { background: #f1f6ff; } \n    .brand-vinix { background: #fafafa; color: #999; } \n \n    .score-bisa { color: var(--orange); font-weight: bold; } \n    .score-nf { color: var(--blue); font-weight: bold; } \n \n    .bar { \n      height: 18px; \n      border-radius: 10px; \n      margin: 6px 0 14px; \n      background: #ddd; \n      overflow: hidden; \n    } \n \n    .bar span { \n      display: block; \n      height: 100%; \n    } \n \n    .bar-bisa span { width: 53.3%; background: var(--orange); } \n    .bar-nf span { width: 46.7%; background: var(--blue); } \n \n    footer { \n      margin-top: 40px; \n      text-align: center; \n      font-size: 13px; \n      color: var(--text-light); \n    } \n \n    @media print { \n      section { page-break-inside: avoid; } \n    } \n  </style> \n</head> \n \n<body> \n \n<header> \n  <div class=\"container\"> \n    <h1>\n📊\n Laporan Strategi Bisnis & Intelijen Kompetitif</h1> \n    <p>Analisis Share of Voice (SoV) & Reputasi Digital</p> \n    <div class=\"badge\">\n📅\n 07 Januari 2026</div> \n  </div> \n</header> \n \n<div class=\"container\"> \n \n  <section> \n    <h2>\n📌\n Ringkasan Eksekutif</h2> \n    <p> \n      Dalam percakapan digital terbatas (<strong>15 mention</strong>), \n      <span class=\"highlight\">BISA AI</span> unggul tipis dengan \n      <strong>53.3% Share of Voice</strong>, sementara \n      <strong>NF Academy</strong> berada di <strong>46.7%</strong>. \n    </p> \n \n    <p><strong>BISA AI (53.3%)</strong></p> \n    <div class=\"bar bar-bisa\"><span></span></div> \n \n    <p><strong>NF Academy (46.7%)</strong></p> \n    <div class=\"bar bar-nf\"><span></span></div> \n  </section> \n \n  <section> \n    <h2>\n📢\n Analisis Share of Voice</h2> \n \n    <h3>\n🤖\n BISA AI</h3> \n    <ul> \n      <li>Fokus topikal AI & Data Science</li> \n      <li>Promosi agresif dan edukatif</li> \n      <li>Akses kursus gratis + sertifikasi</li> \n    </ul> \n \n    <h3>\n🎓\n NF Academy</h3> \n    <ul> \n      <li>Konten dominan profil statis</li> \n      <li>Minim diskusi & CTA viral</li> \n    </ul> \n  </section> \n \n  <section> \n    <h2>\n⭐\n Skor Reputasi</h2> \n    <table> \n      <tr> \n        <th>Brand</th> \n        <th>Skor</th> \n        <th>Kelebihan</th> \n        <th>Kelemahan</th> \n      </tr> \n      <tr class=\"brand-bisa\"> \n        <td><strong>BISA AI</strong></td> \n        <td class=\"score-bisa\">8.0 / 10</td> \n        <td>Relevan, gratis, online</td> \n        <td>Branding generik</td> \n      </tr> \n      <tr class=\"brand-nf\"> \n        <td><strong>NF Academy</strong></td> \n        <td class=\"score-nf\">6.5 / 10</td> \n        <td>Lokasi fisik, B2B</td> \n        <td>Konten kaku</td> \n      </tr> \n      <tr class=\"brand-vinix\"> \n        <td><strong>Vinix 7</strong></td> \n        <td>0 / 10</td> \n        <td>—</td> \n        <td>Tidak terdeteksi</td> \n      </tr> \n    </table> \n  </section> \n \n  <section> \n    <h2>\n💡\n Strategi Rekomendasi untuk NF Academy</h2> \n    <ol> \n      <li>Aktifkan konten sosial & instruktur</li> \n      <li>Tonjolkan keunggulan kelas tatap muka</li> \n      <li>Gunakan promosi berbasis hasil nyata</li> \n    </ol> \n  </section> \n \n  <footer> \n    <p>© 2026 — Laporan Strategi Bisnis & Intelijen Kompetitif</p> \n    <p>Data publik & analisis sosial media (Jan 2026)</p> \n  </footer> \n \n</div> \n \n</body> \n</html>"
+      },
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        1152,
+        208
+      ],
+      "id": "bccd4aa8-e3b3-4fec-bfe7-d5177bc548d0",
+      "name": "HTML"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.pdfshift.io/v3/convert/pdf",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-Key",
+              "value": "sk_24618183457636c6d2b7582e8a1a05cb31510f08"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "source",
+              "value": "={{ $json.html }}"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1360,
+        208
+      ],
+      "id": "46aa3ae1-de67-4b66-a870-726740b0dd4d",
+      "name": "HTML to PDF"
+    },
+    {
+      "parameters": {
+        "operation": "sendDocument",
+        "chatId": "6694078886",
+        "binaryData": true,
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1568,
+        208
+      ],
+      "id": "a37a29cf-04e4-4cf5-8553-e614d5796727",
+      "name": "Kirim Ke Telegram",
+      "webhookId": "70b29be3-0766-4b57-b168-aaa30c52f5fe",
+      "credentials": {
+        "telegramApi": {
+          "id": "7F3QHpvmxcywTZss",
+          "name": "Telegram account 6"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "NFA",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "BISA AI",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Vinix7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "BISA AI": {
+      "main": [
+        [
+          {
+            "node": "Menggabungkan Data",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Vinix7": {
+      "main": [
+        [
+          {
+            "node": "Menggabungkan Data",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "NFA": {
+      "main": [
+        [
+          {
+            "node": "Menggabungkan Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Menggabungkan Data": {
+      "main": [
+        [
+          {
+            "node": "Menyiapkan Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Menyiapkan Data": {
+      "main": [
+        [
+          {
+            "node": "Prompt untuk membandingkan",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Prompt untuk membandingkan",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prompt untuk membandingkan": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTML": {
+      "main": [
+        [
+          {
+            "node": "HTML to PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTML to PDF": {
+      "main": [
+        [
+          {
+            "node": "Kirim Ke Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "e914e9c5-72ab-417f-8c23-685d67a6c334",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a8029a7adbdc0dbd60336a80f6905c6c6343c6a279cd22aaad11890dcf0bf2ab"
+  },
+  "id": "rclBvSX7NSXLFRsx",
+  "tags": []
+}
